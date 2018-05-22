@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Cocos</string>
+    <string name="perm_camera">Se necesitan permisos para la cámara</string>
+    <string name="pick_image_intent_text">Elegir imagen</string>
+    <string name="demo_min_label">min</string>
+    <string name="demo_max_label">max</string>
+
+    <string name="facebook_app_id">2002215986463169</string>
+    <string name="google_auth_key">127745630015-jgdhr2t14f7dunvers9i4sfnhacrk7ro.apps.googleusercontent.com</string>
+
+    //Landing strings
+    <string name="sign_in">Iniciar Sesión</string>
+    <string name="register">Registrarse</string>
+    <string name="find">¿Buscas Pushay para usuarios?</string>
+    <string name="download">Descárgala aquí</string>
+
+    //login strings
+    <string name="email">Correo Electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="begin">Iniciar sesión con:</string>
+    <string name="invited">Continuar como invitado</string>
+    <string name="create_account">Crear una cuenta nueva</string>
+
+
+    //Register strings
+    <string name="first_name">Nombre</string>
+    <string name="last_name">Apellido</string>
+    <string name="birth">Fecha de nacimiento</string>
+    <string name="cellphone">Celular</string>
+    <string name="male">Hombre</string>
+    <string name="female">Mujer</string>
+    <string name="create">Crear cuenta</string>
+    <string name="conditions">Cuando creas una cuenta en COCOS estas confirmando que
+acepta los siguiente: </string>
+
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed
+diam nonummy nibh euismod tincidunt ut laoreet dolore magna
+aliquam erat volutpat. Ut wisi enim ad minim veniam, quis
+nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip
+ex ea commodo consequat. Duis autem vel eum iriure dolor in
+hendrerit in vulputate velit esse molestie consequat, vel illum
+dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto
+odio dignissim qui blandit praesent luptatum zzril delenit augue
+duis dolore te feugait nulla facilisi.
+Lorem ipsum dolor sit amet, cons ectetuer adipiscing elit, sed
+diam nonummy nibh euismod tincidunt ut laoreet dolore magna
+aliquam erat volutpat. Ut wisi enim ad minim veniam, quis
+nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip
+ex ea commodo consequat.</string>
+
+    <string name="mini_lorem">Quieres obtener las mejores ofertas del mercado, tu mejor opción es utilizar
+        Cocos un aplicativo dónde tú podrás elegir entre las variadas ofertas que existan y escoger la que
+        más te acomode. Puedes pasar un momento muy especial y memorable con tus amigos y familiares al mejor precio.
+        Disfruta de experiencias únicas con esas personas especiales con Cocos.
+</string>
+
+
+    <!--    Permissions    -->
+    <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>
+    <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">Location permission is required for this demo.</string>
+
+</resources>

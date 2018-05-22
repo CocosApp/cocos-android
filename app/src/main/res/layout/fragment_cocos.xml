@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:visibility="gone"
+        android:layout_below="@id/appbar"
+        android:layout_width="match_parent"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="20dp"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/tv_name"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ly_image_profile"
+                android:text="@string/mini_lorem"
+                android:textSize="15sp" />
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/cocos_info_text"/>
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="15dp"
+        android:orientation="vertical">
+
+
+        <Button
+            android:layout_below="@id/tv_name"
+            android:id="@+id/btn_comunicate"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            android:textAllCaps="false"
+            android:drawableEnd="@drawable/ic_whats"
+            android:paddingEnd="20dp"
+            android:background="@drawable/button_square_border_blue"
+            android:text="Comunícate con nosotros"/>
+
+        <Button
+            android:layout_below="@id/btn_comunicate"
+            android:id="@+id/btn_afiliate"
+            android:layout_alignParentBottom="true"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:textAllCaps="false"
+            android:background="@drawable/button_square_border_blue"
+            android:text="Afilia tu restaurante "/>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

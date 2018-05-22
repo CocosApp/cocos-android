@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.cerezaconsulting.cocosapp">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission-sdk-23 android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission-sdk-23 android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission-sdk-23 android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:name="com.cerezaconsulting.cocosapp.CocosAplication"
+
+        android:theme="@style/AppTheme">
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="3a98bae6f2026efc85a22983e01041e20f432cf5"
+            />
+
+
+        <activity android:name=".presentation.main.MainActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity android:name=".presentation.load.LoadActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".presentation.auth.LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.register.RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.main.listrestaurante.ListRestaurantActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.main.restaurante.RestaurantActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.slide.SlideActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.main.promociones.PromoPropiaActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.main.restaurante.Visor"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".presentation.main.buscador.ActivityBuscador"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".presentation.main.cardrestaurantes.CardRestaurantActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".presentation.main.PermisosActivity"
+            android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".notification.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".notification.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

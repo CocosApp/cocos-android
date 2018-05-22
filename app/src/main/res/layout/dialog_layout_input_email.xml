@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:padding="40dp"
+    android:background="@drawable/back_forgot_pass"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logotipo_cocos_03"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_below="@id/iv_logo"
+        android:id="@+id/input_email"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <EditText
+            android:hint="Correo electrónico"
+            android:textColorHint="@color/white"
+            android:textSize="@dimen/xlarge_text"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/white"
+            android:inputType="textEmailAddress"
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_below="@id/input_email"
+        android:id="@+id/input_email_again"
+        android:textColorHint="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <EditText
+            android:hint="Confirmar correo"
+            android:textColorHint="@color/white"
+            android:textSize="@dimen/xlarge_text"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/white"
+            android:inputType="textEmailAddress"
+            android:id="@+id/et_email_again"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:layout_below="@id/input_email_again"
+        android:textColor="@color/black"
+        android:textAllCaps="false"
+        android:id="@+id/btn_send_email"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/button_square_border"
+        android:text="Restablecer Contraseña" />
+
+    <TextView
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:textColor="@color/white"
+        android:text="Revisa tu correo para restablecer contraseña"/>
+
+</RelativeLayout>

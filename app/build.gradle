@@ -1,0 +1,117 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+android {
+
+    signingConfigs {
+        config {
+            keyAlias 'cocosapp'
+            keyPassword 'cocosapp'
+            storePassword 'cocosapp'
+            storeFile file('/Users/kath/Documents/projects/jks/cocosapp/cocosapp.jks')
+        }
+    }
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    defaultConfig {
+        applicationId "com.cerezaconsulting.cocosapp"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 17
+        versionName "1.0.7"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.config
+    }
+    buildTypes {
+        debug {
+            minifyEnabled true
+
+            // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
+            useProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
+        }
+
+        release {
+            minifyEnabled true
+            useProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
+        }
+    }
+    flavorDimensions 'default'
+    productFlavors {
+        prod {
+            dimension 'default'
+            buildConfigField 'String', 'BASE', '"http://backend.appcocos.com/api/"'
+            //signingConfig signingConfigs.config
+        }
+        mock {
+            dimension 'default'
+            buildConfigField 'String', 'BASE', '"http://backend.appcocos.com/api/"'
+            applicationIdSuffix = ".test"
+        }
+    }
+// Remove mockRelease as it's not needed.
+    android.variantFilter { variant ->
+        
+        if (variant.buildType.name == 'release'
+                && variant.getFlavors().get(0).name == 'mock') {
+            variant.setIgnore(true);
+        }
+    }
+    buildToolsVersion '27.0.2'
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation supportDesignLibraries.appcompat
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.google.firebase:firebase-messaging:11.6.0'
+    compile 'com.google.firebase:firebase-core:11.6.0'
+    androidTestCompile 'junit:junit:4.12'
+    implementation supportDesignLibraries.design
+    implementation supportDesignLibraries.recyclerView
+    implementation supportDesignLibraries.supportv4
+    implementation supportDesignLibraries.supportv13
+    implementation supportDesignLibraries.cardview
+    compile coreProject.retrofit
+    compile coreProject.retrofitGson
+    compile coreProject.gson
+    compile coreProject.interceptor
+    compile coreProject.butterKnife
+    annotationProcessor coreProject.butterknifeProcesor
+    compile helpLibraries.guava
+    compile helpLibraries.calligraphy
+    compile helpLibraries.pagerindicator
+    compile helpLibraries.saripaar
+    compile helpLibraries.permissions
+    compile helpLibraries.iab
+    compile googleService.auth
+    compile imagesLoader.glide
+    compile facebookCore.facebook
+    compile 'com.roughike:bottom-bar:2.3.1'
+    androidTestCompile 'org.testng:testng:6.9.6'
+    compile 'de.hdodenhof:circleimageview:2.0.0'
+
+    compile 'com.miguelcatalan:materialsearchview:1.4.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true;
+    }
+    compile 'com.google.firebase:firebase-core:11.6.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.0@aar') {
+        transitive = true
+    }
+    compile 'com.google.firebase:firebase-crash:11.6.0'
+    compile 'com.google.android.gms:play-services-auth:11.6.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+
+
+}
+
+
+
+apply plugin: 'com.google.gms.google-services'
