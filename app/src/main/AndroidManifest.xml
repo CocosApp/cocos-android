@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cerezaconsulting.cocosapp">
+    package="com.cocos.cocosapp">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission-sdk-23 android:name="android.permission.INTERNET"/>
@@ -20,7 +20,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name="com.cerezaconsulting.cocosapp.CocosAplication"
+        android:name="com.cocos.cocosapp.CocosAplication"
 
         android:theme="@style/AppTheme">
 
@@ -32,12 +32,12 @@
             />
 
 
-        <activity android:name=".presentation.main.MainActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.main.MainActivity"
             android:screenOrientation="portrait">
 
         </activity>
 
-        <activity android:name=".presentation.load.LoadActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.load.LoadActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -47,37 +47,37 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".presentation.auth.LoginActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.auth.LoginActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.register.RegisterActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.register.RegisterActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.main.listrestaurante.ListRestaurantActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.main.listrestaurante.ListRestaurantActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.main.restaurante.RestaurantActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.main.restaurante.RestaurantActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.slide.SlideActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.slide.SlideActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.main.promociones.PromoPropiaActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.main.promociones.PromoPropiaActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.main.restaurante.Visor"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".presentation.main.buscador.ActivityBuscador"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".presentation.main.cardrestaurantes.CardRestaurantActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.main.restaurante.Visor"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".presentation.main.PermisosActivity"
+        <activity android:name="com.cocos.cocosapp.presentation.main.buscador.ActivityBuscador"
+            android:screenOrientation="portrait"/>
+        <activity android:name="com.cocos.cocosapp.presentation.main.cardrestaurantes.CardRestaurantActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="com.cocos.cocosapp.presentation.main.PermisosActivity"
             android:screenOrientation="portrait"/>
 
         <service
-            android:name=".notification.MyFirebaseInstanceIDService">
+            android:name="com.cocos.cocosapp.notification.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
         <service
-            android:name=".notification.MyFirebaseMessagingService">
+            android:name="com.cocos.cocosapp.notification.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

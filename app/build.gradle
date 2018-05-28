@@ -15,11 +15,11 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
-        applicationId "com.cerezaconsulting.cocosapp"
+        applicationId "com.cocos.cocosapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 17
-        versionName "1.0.7"
+        versionCode 1
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
     }
@@ -44,12 +44,12 @@ android {
     productFlavors {
         prod {
             dimension 'default'
-            buildConfigField 'String', 'BASE', '"http://backend.appcocos.com/api/"'
+            buildConfigField 'String', 'BASE', '"https://appcocos.com/api/"'
             //signingConfig signingConfigs.config
         }
         mock {
             dimension 'default'
-            buildConfigField 'String', 'BASE', '"http://backend.appcocos.com/api/"'
+            buildConfigField 'String', 'BASE', '"https://appcocos.com/api/"'
             applicationIdSuffix = ".test"
         }
     }
