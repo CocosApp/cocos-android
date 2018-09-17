@@ -20,10 +20,16 @@ import com.cocos.cocosapp.core.RecyclerViewScrollListener;
 import com.cocos.cocosapp.core.ScrollChildSwipeRefreshLayout;
 import com.cocos.cocosapp.data.entities.CardEntity;
 import com.cocos.cocosapp.data.entities.SubCatEntity;
+import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.cardrestaurantes.CardRestaurantActivity;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +59,9 @@ public class CardFragment extends BaseFragment implements CardContract.View {
     private LinearLayoutManager mLayoutManager;
     private CardContract.Presenter mPresenter;
     private ProgressDialogCustom mProgressDialogCustom;
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private String date, time;
+    private SessionManager mSessionManager;
 
     public CardFragment() {
         // Requires empty public constructor
@@ -80,8 +89,19 @@ public class CardFragment extends BaseFragment implements CardContract.View {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = new CardPresenter(this, getContext());
+        mSessionManager = new SessionManager(getContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
 
         //idCountry =  (int) getArguments().getSerializable("id_country");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Bundle params = new Bundle();
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "benefits_button");
+        mFirebaseAnalytics.logEvent("benefits_button", params);
     }
 
     @Nullable
@@ -129,6 +149,17 @@ public class CardFragment extends BaseFragment implements CardContract.View {
         Bundle bundle = new Bundle();
         bundle.putInt("id", cardEntity.getId());
         bundle.putString("name", cardEntity.getName());
+
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_benefit", cardEntity.getId());
+        params.putString("name_benefit", cardEntity.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_benefit");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("detail_benefit", params);
+
         nextActivity(getActivity(),bundle, CardRestaurantActivity.class, false);
     }
 
@@ -238,6 +269,22 @@ public class CardFragment extends BaseFragment implements CardContract.View {
     }
 
 
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
+
+    }
 
 }

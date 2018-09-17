@@ -7,12 +7,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cocos.cocosapp.R;
+import com.cocos.cocosapp.data.local.SessionManager;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,15 +47,27 @@ public class DialogAutos extends AlertDialog {
     LinearLayout btnCabify;
     private Context mContext;
 
+    private String date, time;
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private SessionManager mSessionManager;
+    private int idRestaurant;
+    private String nameRestaurant;
+
+
     //private CreateMenuContract.View mView;
 
-    public DialogAutos(Context context) {
+    public DialogAutos(Context context, int idRestaurant, String nameRestaurant) {
         super(context);
         LayoutInflater inflater = LayoutInflater.from(getContext());
         final View view = inflater.inflate(R.layout.dialog_cars, null);
         ButterKnife.bind(this, view);
         setView(view);
+        this.idRestaurant = idRestaurant;
+        this.nameRestaurant = nameRestaurant;
         mContext = context;
+        mSessionManager = new SessionManager(context);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+
 
         //this.mView = mView;
 
@@ -57,6 +77,19 @@ public class DialogAutos extends AlertDialog {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_uber:
+
+
+                Bundle paramsUber = new Bundle();
+                paramsUber.putInt("id_user", mSessionManager.getUserEntity().getId());
+                paramsUber.putString("name_user", mSessionManager.getUserEntity().getFullName());
+                paramsUber.putInt("id_restaurant", idRestaurant);
+                paramsUber.putString("name_restaurant", nameRestaurant);
+                paramsUber.putString("date", getDateAndTimeNow());
+                paramsUber.putString("label", "take_uber");
+                paramsUber.putString("so", "android");
+
+                mFirebaseAnalytics.logEvent("take_uber", paramsUber);
+
                 PackageManager pm = getContext().getPackageManager();
                 try {
                     pm.getPackageInfo("com.ubercab", PackageManager.GET_ACTIVITIES);
@@ -73,6 +106,18 @@ public class DialogAutos extends AlertDialog {
                 }
                 break;
             case R.id.btn_cabify:
+
+                Bundle paramsCabify = new Bundle();
+                paramsCabify.putInt("id_user", mSessionManager.getUserEntity().getId());
+                paramsCabify.putString("name_user", mSessionManager.getUserEntity().getFullName());
+                paramsCabify.putInt("id_restaurant", idRestaurant);
+                paramsCabify.putString("name_restaurant", nameRestaurant);
+                paramsCabify.putString("date", getDateAndTimeNow());
+                paramsCabify.putString("label", "take_cabify");
+                paramsCabify.putString("so", "android");
+
+                mFirebaseAnalytics.logEvent("take_cabify", paramsCabify);
+
                 PackageManager pm2 = getContext().getPackageManager();
                 try {
                     pm2.getPackageInfo("com.cabify.rider", PackageManager.GET_ACTIVITIES);
@@ -97,6 +142,23 @@ public class DialogAutos extends AlertDialog {
                 dismiss();
                 break;
         }
+    }
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
+
     }
 
     public void LaunchComponent(String packageName) {

@@ -21,9 +21,15 @@ import com.cocos.cocosapp.core.ScrollChildSwipeRefreshLayout;
 import com.cocos.cocosapp.data.entities.DescEntity;
 import com.cocos.cocosapp.data.entities.RestEntinty;
 import com.cocos.cocosapp.data.entities.SubCatEntity;
+import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,6 +60,9 @@ public class PromoFragment extends BaseFragment implements PromoContract.View {
     private PromoContract.Presenter mPresenter;
     private ProgressDialogCustom mProgressDialogCustom;
     private RestEntinty restEntinty;
+    private FirebaseAnalytics mFirebaseAnalytics;
+    private SessionManager mSessionManager;
+    private String date, time;
 
     public PromoFragment() {
         // Requires empty public constructor
@@ -75,6 +84,9 @@ public class PromoFragment extends BaseFragment implements PromoContract.View {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = new PromoPresenter(this, getContext());
+        mSessionManager = new SessionManager(getContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+
         Bundle bundle = getArguments();
         restEntinty = (RestEntinty) bundle.getSerializable("restEntity");
         //restEntinty = (RestEntinty) getArguments().getSerializable("restEntity");
@@ -164,6 +176,15 @@ public class PromoFragment extends BaseFragment implements PromoContract.View {
     @Override
     public void clickItemPromo(DescEntity descEntity) {
 
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_discount", descEntity.getId());
+        params.putString("name_discount", descEntity.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_discount");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("detail_discount", params);
 
         if(descEntity.getPorc()!=null && descEntity.getCard()!=null){
 
@@ -234,6 +255,24 @@ public class PromoFragment extends BaseFragment implements PromoContract.View {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+
+    }
+
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
 
     }
 }

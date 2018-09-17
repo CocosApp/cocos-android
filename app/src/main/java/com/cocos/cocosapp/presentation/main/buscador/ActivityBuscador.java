@@ -21,11 +21,17 @@ import com.cocos.cocosapp.core.BaseActivity;
 import com.cocos.cocosapp.core.RecyclerViewScrollListener;
 import com.cocos.cocosapp.core.ScrollChildSwipeRefreshLayout;
 import com.cocos.cocosapp.data.entities.RestauranteResponse;
+import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.restaurante.RestaurantActivity;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,6 +65,10 @@ public class ActivityBuscador extends BaseActivity implements BuscadorContract.V
     private BuscadorContract.Presenter mPresenter;
     private ProgressDialogCustom mProgressDialogCustom;
 
+    private String date, time;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    private SessionManager mSessionManager;
     private String text;
 
     @Override
@@ -103,6 +113,8 @@ public class ActivityBuscador extends BaseActivity implements BuscadorContract.V
                 }*/
             }
         });
+        mSessionManager = new SessionManager(getApplicationContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         mProgressDialogCustom = new ProgressDialogCustom(getApplicationContext(), "Obteniendo datos...");
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -141,6 +153,18 @@ public class ActivityBuscador extends BaseActivity implements BuscadorContract.V
     public void clickItemRestaurante(RestauranteResponse restEntinty) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("restEntity", restEntinty);
+
+
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_restaurant", restEntinty.getId());
+        params.putString("name_restaurant", restEntinty.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_restaurant");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("detail_restaurant", params);
+
         nextActivity(ActivityBuscador.this, bundle, RestaurantActivity.class, false);
     }
 
@@ -285,5 +309,22 @@ public class ActivityBuscador extends BaseActivity implements BuscadorContract.V
     public void onSearchViewClosed() {
         mPresenter.loadList("A");
         mAdapter.notifyDataSetChanged();
+    }
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
+
     }
 }

@@ -22,10 +22,16 @@ import com.cocos.cocosapp.core.RecyclerViewScrollListener;
 import com.cocos.cocosapp.core.ScrollChildSwipeRefreshLayout;
 import com.cocos.cocosapp.data.entities.RestauranteResponse;
 import com.cocos.cocosapp.data.entities.SubCatEntity;
+import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.restaurante.RestaurantActivity;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +54,7 @@ public class ListRestaurantFragment extends BaseFragment implements ListRestaura
     @BindView(R.id.refresh_layout)
     ScrollChildSwipeRefreshLayout refreshLayout;
     Unbinder unbinder;
+    private SessionManager mSessionManager;
     private SubCatEntity subCatEntity;
     private String daySelected;
     private ListRestaurantAdapter mAdapter;
@@ -55,6 +62,9 @@ public class ListRestaurantFragment extends BaseFragment implements ListRestaura
     private ListRestaurantContract.Presenter mPresenter;
     private ProgressDialogCustom mProgressDialogCustom;
     int id;
+    private String date, time;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
 
 
     private Double latitude;
@@ -80,6 +90,9 @@ public class ListRestaurantFragment extends BaseFragment implements ListRestaura
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = new ListRestaurantPresenter(this, getContext());
+        mSessionManager = new SessionManager(getContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+
         id = (int) getArguments().getSerializable("id");
          latitude = getArguments().getDouble("latitude");
          longitude = getArguments().getDouble("longitude");
@@ -120,20 +133,6 @@ public class ListRestaurantFragment extends BaseFragment implements ListRestaura
 
         unbinder = ButterKnife.bind(this, root);
 
-       /* AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(toolbar);
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                HomeFragment fragment = new HomeFragment();
-                fragmentTransaction.replace(R.id.contentContainer_1, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });*/
 
         return root;
     }
@@ -153,6 +152,18 @@ public class ListRestaurantFragment extends BaseFragment implements ListRestaura
     public void clickItemRestaurante(RestauranteResponse restauranteResponse) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("restEntity", restauranteResponse);
+
+
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_restaurant", restauranteResponse.getId());
+        params.putString("name_restaurant", restauranteResponse.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_restaurant");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("detail_restaurant", params);
+
         nextActivity(getActivity(), bundle, RestaurantActivity.class, false);
 
     }
@@ -270,6 +281,23 @@ public class ListRestaurantFragment extends BaseFragment implements ListRestaura
                 getActivity().onBackPressed();
         }
         return true;
+
+    }
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
 
     }
 }

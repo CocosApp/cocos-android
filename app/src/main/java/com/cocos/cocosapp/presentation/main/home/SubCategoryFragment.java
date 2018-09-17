@@ -24,12 +24,17 @@ import com.cocos.cocosapp.data.entities.SubCatEntity;
 import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.listrestaurante.ListRestaurantActivity;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,8 +64,10 @@ public class SubCategoryFragment extends BaseFragment implements SubcategoryCont
     private SubCategoryAdapter mPostAdapter;
     private LinearLayoutManager mlinearLayoutManager;
     private SessionManager mSessionManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private Double latitude, longitude;
+    private String date, time;
 
     public SubCategoryFragment() {
         // Requires empty public constructor
@@ -76,7 +83,7 @@ public class SubCategoryFragment extends BaseFragment implements SubcategoryCont
         mSessionManager = new SessionManager(getActivity());
         mPresenter = new SubCategoryPresenter(this, getContext());
         EventBus.getDefault().register(this);
-
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
     }
 
     @Override
@@ -85,6 +92,16 @@ public class SubCategoryFragment extends BaseFragment implements SubcategoryCont
         mPresenter.start();
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Bundle params = new Bundle();
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "category_button");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("category_button", params);
+    }
 
     @Nullable
     @Override
@@ -181,6 +198,17 @@ public class SubCategoryFragment extends BaseFragment implements SubcategoryCont
             bundle.putDouble("longitude", longitude);
         }
 
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_category", cityEntity.getId());
+        params.putString("name_category", cityEntity.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_category");
+        params.putString("so", "android");
+
+        mFirebaseAnalytics.logEvent("detail_category", params);
+
         nextActivity(getActivity(),bundle, ListRestaurantActivity.class, false);
     }
 
@@ -243,4 +271,24 @@ public class SubCategoryFragment extends BaseFragment implements SubcategoryCont
         EventBus.getDefault().unregister(this);
 
     }
+
+
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
+
+    }
+
 }

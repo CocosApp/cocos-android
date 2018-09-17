@@ -26,14 +26,20 @@ import com.cocos.cocosapp.core.BaseFragment;
 import com.cocos.cocosapp.core.RecyclerViewScrollListener;
 import com.cocos.cocosapp.core.ScrollChildSwipeRefreshLayout;
 import com.cocos.cocosapp.data.entities.RestauranteResponse;
+import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.restaurante.RestaurantActivity;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,10 +71,13 @@ public class FragmentCercaDeMi extends BaseFragment implements GPSRestaurantCont
     private GPSAdapter mAdapter;
     private LinearLayoutManager mLayoutManager;
     private ProgressDialogCustom mProgressDialogCustom;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
+    private SessionManager mSessionManager;
     private LocationManager mlocManager;
 
     private AlertDialog dialogogps;
+    private String date, time;
 
     public FragmentCercaDeMi() {
     }
@@ -87,12 +96,17 @@ public class FragmentCercaDeMi extends BaseFragment implements GPSRestaurantCont
         }*/
     }
 
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mPresenter = new GPSRestaurantPresenter(this, getContext());
         EventBus.getDefault().register(this);
+        mSessionManager = new SessionManager(getContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+
 
 //        latitude = getArguments().getDouble("latitude");
   //      longitude = getArguments().getDouble("longitude");
@@ -104,6 +118,16 @@ public class FragmentCercaDeMi extends BaseFragment implements GPSRestaurantCont
         } else {
             locationStart();
         }*/
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Bundle params = new Bundle();
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "near_me_button");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("near_me_button", params);
     }
 
     @Nullable
@@ -198,6 +222,16 @@ public class FragmentCercaDeMi extends BaseFragment implements GPSRestaurantCont
     public void clickItemRestaurante(RestauranteResponse restauranteResponse) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("restEntity", restauranteResponse);
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_restaurant", restauranteResponse.getId());
+        params.putString("name_restaurant", restauranteResponse.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_restaurant");
+        params.putString("so", "android");
+        mFirebaseAnalytics.logEvent("detail_restaurant", params);
+
         nextActivity(getActivity(), bundle, RestaurantActivity.class, false);
     }
 
@@ -310,6 +344,24 @@ public class FragmentCercaDeMi extends BaseFragment implements GPSRestaurantCont
 
     }
 
+
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
+
+    }
     /*@Override
     public void onLocationChanged(Location location) {
         latitude = location.getLatitude();

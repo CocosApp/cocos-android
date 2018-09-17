@@ -8,12 +8,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
+import com.cocos.cocosapp.BuildConfig;
 import com.cocos.cocosapp.R;
 import com.cocos.cocosapp.core.BaseActivity;
 import com.cocos.cocosapp.core.BaseFragment;
@@ -38,6 +41,9 @@ import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.informacion.InformacionFragment;
 import com.cocos.cocosapp.presentation.main.promociones.PromoFragment;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.cocos.cocosapp.utils.TakeScreenShot;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.roughike.bottombar.BottomBarTab;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -45,8 +51,13 @@ import com.viewpagerindicator.CirclePageIndicator;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -91,6 +102,11 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
     //
     Bundle bundle;
     private int idRestaurante;
+
+
+    private String date, time;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     public RestaurantFragment() {
         // Requires empty public constructor
 
@@ -114,6 +130,7 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
         super.onCreate(savedInstanceState);
         mPresenter = new RestaurantPresenter(this, getContext());
         mSessionManager = new SessionManager(getContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
         restauranteResponse = (RestauranteResponse) getArguments().getSerializable("restEntity");
         setHasOptionsMenu(true);
 
@@ -147,7 +164,6 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
         mProgressDialogCustom = new ProgressDialogCustom(getContext(), "Obteniendo datos...");
         mPresenter.getRestaurante(restauranteResponse.getId());
 
-
     }
 
     @Override
@@ -169,20 +185,49 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
                 }else{
                     mPresenter.sendMyFavoriteRestaurant(newRestEntity.getId());
                 }
-
                 return true;
+
             case R.id.action_send:
                 //Toast.makeText(getActivity(), "Compartir", Toast.LENGTH_SHORT).show();
+
+                Bundle paramsUber = new Bundle();
+                paramsUber.putInt("id_user", mSessionManager.getUserEntity().getId());
+                paramsUber.putString("name_user", mSessionManager.getUserEntity().getFullName());
+                paramsUber.putInt("id_restaurant", restauranteResponse.getId());
+                paramsUber.putString("name_restaurant", restauranteResponse.getName());
+                paramsUber.putString("date", getDateAndTimeNow());
+                paramsUber.putString("label", "share_restaurant");
+                paramsUber.putString("so", "android");
+                mFirebaseAnalytics.logEvent("share_restaurant", paramsUber);
 
                 if(mSessionManager.getUserEntity().getFirst_name().equals("INVITADO")){
                     ((BaseActivity) getActivity()).showMessageError("No se puede compartir como invitado, por favor registrarse para continuar");
                 }else{
-                   shareImage(restauranteResponse.getPhoto1(), getContext());
+                    StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                    StrictMode.setVmPolicy(builder.build());
+
+                    shareImage(TakeScreenShot.takeScreenShot(getActivity()));
+                  // shareImage(restauranteResponse.getPhoto1(), getContext());
                 }
 
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private Bitmap getCapture(){
+        try {
+            // crear un bitmap con la captura de pantalla
+            View v1 = getActivity().getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+            return bitmap;
+        } catch (Throwable e) {
+            // Several error may come out with file handling or OOM
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -209,10 +254,33 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
 
         }
     };
-    public void shareImage(String url,final Context context) {
+    public void shareImage(Bitmap bitmap) {
 
-        Picasso.with(context).load(url).into(target);
+        /***** COMPARTIR IMAGEN *****/
+        try {
+            File file = new File(getContext().getCacheDir(), bitmap + ".png");
+            FileOutputStream fOut = null;
+            fOut = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+            file.setReadable(true, false);
+            final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri imageUri = FileProvider.getUriForFile(
+                    getContext(),
+                    BuildConfig.APPLICATION_ID +".provider", //(use your app signature + ".provider" )
+                    file);
+            intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            intent.setType("image/png");
+            getContext().startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Picasso.with(context).load(url).into(target);
     }
+
     static public Uri getLocalBitmapUri(Bitmap bmp, Context context) {
         Uri bmpUri = null;
         try {
@@ -315,6 +383,24 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
 
     }
 
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
+
+    }
+
     @OnClick({R.id.btn_uber, R.id.btn_reservar})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -322,7 +408,7 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.ubercab"));
                 startActivity(i);*/
-                DialogAutos dialogAutos = new DialogAutos(getContext());
+                DialogAutos dialogAutos = new DialogAutos(getContext(), restauranteResponse.getId(), restauranteResponse.getName());
                 dialogAutos.show();
 
                 break;
@@ -423,6 +509,7 @@ public class RestaurantFragment extends BaseFragment implements RestaurantContra
             collection.removeView((View) view);
         }
     }
+
 
 
 }

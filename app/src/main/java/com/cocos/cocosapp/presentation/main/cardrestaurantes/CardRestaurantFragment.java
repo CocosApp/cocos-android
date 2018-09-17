@@ -23,10 +23,16 @@ import com.cocos.cocosapp.core.ScrollChildSwipeRefreshLayout;
 import com.cocos.cocosapp.data.entities.CardRestResponse;
 import com.cocos.cocosapp.data.entities.RestauranteResponse;
 import com.cocos.cocosapp.data.entities.SubCatEntity;
+import com.cocos.cocosapp.data.local.SessionManager;
 import com.cocos.cocosapp.presentation.main.restaurante.RestaurantActivity;
 import com.cocos.cocosapp.utils.ProgressDialogCustom;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +63,10 @@ public class CardRestaurantFragment extends BaseFragment implements CardRestaura
     private CardRestaurantContract.Presenter mPresenter;
     private ProgressDialogCustom mProgressDialogCustom;
     int id;
+    private String date, time;
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    private SessionManager mSessionManager;
 
     public CardRestaurantFragment() {
         // Requires empty public constructor
@@ -78,6 +88,9 @@ public class CardRestaurantFragment extends BaseFragment implements CardRestaura
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = new CardRestaurantPresenter(this, getContext());
+        mSessionManager = new SessionManager(getContext());
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getContext());
+
         id = (int) getArguments().getSerializable("id");
     }
 
@@ -193,7 +206,21 @@ public class CardRestaurantFragment extends BaseFragment implements CardRestaura
     public void clickItemRestaurante(RestauranteResponse restauranteResponse) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("restEntity", restauranteResponse);
+
+
+        Bundle params = new Bundle();
+        params.putInt("id_user", mSessionManager.getUserEntity().getId());
+        params.putString("name_user", mSessionManager.getUserEntity().getFullName());
+        params.putInt("id_restaurant", restauranteResponse.getId());
+        params.putString("name_restaurant", restauranteResponse.getName());
+        params.putString("date", getDateAndTimeNow());
+        params.putString("label", "detail_restaurant");
+        params.putString("so", "android");
+
+        mFirebaseAnalytics.logEvent("detail_restaurant", params);
+
         nextActivity(getActivity(), bundle, RestaurantActivity.class, false);
+
 
     }
 
@@ -259,6 +286,24 @@ public class CardRestaurantFragment extends BaseFragment implements CardRestaura
                 getActivity().onBackPressed();
         }
         return true;
+
+    }
+
+    private String getDateAndTimeNow(){
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+        cal.add(Calendar.MINUTE, 1);
+        String newTime = sdfHora.format(cal.getTime());
+
+        date = sdfDate.format(now).replace(".", "-");
+        time = newTime.replace(":", ":");
+
+        return  date + " " + time;
 
     }
 }
